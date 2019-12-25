@@ -1,4 +1,5 @@
 import requests
+import json
 from bs4 import BeautifulSoup
 
 def get_links(link):
@@ -12,27 +13,29 @@ def get_links(link):
         soup = BeautifulSoup(newPage.content, 'html.parser')
         for i in soup.findAll("a", {"class":"entry-title-link"}):
             recipes.append(i.get('href'))
-            #print(i.get('href'))
         accum +=1
     return recipes
 
 def parse_recipe(link):
-    try:
-        page = requests.get(link)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        #print(soup.prettify())
-        for i in soup.findAll("script", {"class": "yoast-schema-graph yoast-schema-graph--main"}):
-            for j in i.descendants:
-                print(j.name)
-    except:
-        pass
+    soup = BeautifulSoup(requests.get(link).text, 'html.parser')
+    data = json.loads(soup.select_one('script.yoast-schema-graph.yoast-schema-graph--main').text)
+    #print(json.dumps(data, indent=4))  # <-- uncomment this to print all data
+
+    recipe = next((g for g in data['@graph'] if g.get('@type', '') == 'Recipe'), None)
+    if recipe:
+        print('Name          =', recipe['name'])
+        print('Prep Time     =', recipe['prepTime'])
+        print('Cook Time     =', recipe['cookTime'])
+        print('Total time    =', recipe['totalTime'])
+        print('Ingredients   =', recipe['recipeIngredient'])
+        print('Calories      =', recipe['nutrition']['calories'])
+        print('Review Count  =', recipe['aggregateRating']['ratingCount'])
+        print('Avg Rating    =', recipe['aggregateRating']['ratingValue'])
 
 def main():
-    parse_recipe("https://thewoksoflife.com/cantonese-chicken-feet-soup/")
-    #link = "https://thewoksoflife.com/category/recipes/chicken/page/"
-    #recipes = get_links(link)
-    #print(recipes)
-
+    link = "https://thewoksoflife.com/category/recipes/chicken/page/"
+    recipes = get_links(link)
+    print(recipes)
 
 if __name__ == "__main__":
     main()
