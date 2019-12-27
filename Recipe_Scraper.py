@@ -2,7 +2,7 @@ import requests
 import json
 import pandas as pd
 import time
-import numpy as np
+from numpy import nan
 from bs4 import BeautifulSoup
 
 
@@ -36,31 +36,31 @@ def parse_recipe(link):
         try:
             prep_time = recipe['prepTime']
         except KeyError:
-            prep_time = np.nan
+            prep_time = nan
         try:
             cook_time = recipe['cookTime']
         except KeyError:
-            cook_time = np.nan
+            cook_time = nan
         try:
             total_time = recipe['totalTime']
         except KeyError:
-            total_time = np.nan
+            total_time = nan
         try:
             ingredients = recipe['recipeIngredient']
         except KeyError:
-            ingredients = np.nan
+            ingredients = nan
         try:
             calories = recipe['nutrition']['calories']
         except KeyError:
-            calories = np.nan
+            calories = nan
         try:
             review_count = recipe['aggregateRating']['ratingCount']
         except KeyError:
-            review_count = np.nan
+            review_count = nan
         try:
             average_rating = recipe['aggregateRating']['ratingValue']
         except KeyError:
-            average_rating = np.nan
+            average_rating = nan
         # creates a dictionary that will be converted into DataFrame for performance purposes
         dictionary = {'Name': name,
                       'Prep Time': prep_time,
