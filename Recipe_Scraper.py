@@ -1,22 +1,24 @@
 import requests
 import json
 import pandas as pd
+import time
+import numpy as np
 from bs4 import BeautifulSoup
 
 
 def get_links(link):
     ''' iterates over link and returns a list of links to every recipe contained in each page '''
     recipes = []
-    accum = 1
+    page_number = 1
     while True:
-        page = link + str(accum) + "/"
+        page = link + str(page_number) + "/"
         newPage = requests.get(page)
         if newPage.status_code == 404:
             break
         soup = BeautifulSoup(newPage.content, 'html.parser')
         for page in soup.findAll("a", {"class": "entry-title-link"}):
             recipes.append(page.get('href'))
-        accum += 1
+        page_number += 1
     return recipes
 
 
@@ -34,39 +36,46 @@ def parse_recipe(link):
         try:
             prep_time = recipe['prepTime']
         except KeyError:
-            prep_time = "NA"
+            prep_time = np.nan
         try:
             cook_time = recipe['cookTime']
         except KeyError:
-            cook_time = "NA"
+            cook_time = np.nan
         try:
             total_time = recipe['totalTime']
         except KeyError:
-            total_time = "NA"
+            total_time = np.nan
         try:
             ingredients = recipe['recipeIngredient']
         except KeyError:
-            ingredients = "NA"
+            ingredients = np.nan
         try:
             calories = recipe['nutrition']['calories']
         except KeyError:
-            calories = "NA"
+            calories = np.nan
         try:
             review_count = recipe['aggregateRating']['ratingCount']
         except KeyError:
-            review_count = "NA"
+            review_count = np.nan
         try:
             average_rating = recipe['aggregateRating']['ratingValue']
         except KeyError:
-            average_rating = "NA"
+            average_rating = np.nan
         # creates a dictionary that will be converted into DataFrame for performance purposes
-        dictionary = {'Name': name, 'Prep Time': prep_time, 'Cook Time': cook_time, 'Total Time': total_time,
-                      'Ingredients': ingredients, 'Calories': calories, 'Review Count': review_count,
+        dictionary = {'Name': name,
+                      'Prep Time': prep_time,
+                      'Cook Time': cook_time,
+                      'Total Time': total_time,
+                      'Ingredients': ingredients,
+                      'Calories': calories,
+                      'Review Count': review_count,
                       'Average Rating': average_rating}
+
+        time.sleep(0.3) # As the website is not big, it's important to take server strain into consideration
         return dictionary
 
+
 def main():
-    dict_list = []
     links = ['https://thewoksoflife.com/category/recipes/chicken/page/',
              'https://thewoksoflife.com/category/recipes/beef-recipes/page/',
              'https://thewoksoflife.com/category/recipes/fish-and-seafood/page/',
@@ -82,14 +91,12 @@ def main():
              'https://thewoksoflife.com/category/recipes/vegetarian/page/',
              'https://thewoksoflife.com/category/recipes/quick-and-easy/page/',
              'https://thewoksoflife.com/category/recipes/rice-and-noodles-recipes/page/']
-    for link in links:
-        recipes = get_links(link)
-        for recipe in recipes:
-            dictionary = parse_recipe(recipe)
-            if dictionary:
-                dict_list.append(dictionary)
-    dict_list = pd.DataFrame(dict_list)
-    dict_list.to_csv("Recipes.csv")
+
+    # Creates a dictionary of parsed recipes
+    dict_list = [parse_recipe(recipe) for link in links for recipe in get_links(link) if parse_recipe(recipe)]
+    recipe_df = pd.DataFrame(dict_list)
+    csv_title = input("Please enter a title for the outputted CSV file: ")
+    recipe_df.to_csv(csv_title + ".csv")
 
 
 if __name__ == "__main__":
