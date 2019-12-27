@@ -1,4 +1,8 @@
-This is a program to scrape, format, and analyze recipes from thewoksoflife.com, a reputable Asian cooking website. In the future, I may expand to other recipe websites, but currently functionality is limited to the Woks of Life.
+# Recipe Scraping Project w/ Data Analysis & Recommender System (in progress)
 
-In this program, I first get the urls of each category listed and scrape their names, cooking times, ingredients, calories, review counts, and average ratings.  I then send the data into a CSV file where I clean the data and perform data analysis using matplotlib and the seaborn libraries. My goal is to eventually develop a recommendation engine, where based on a user's input of available ingredients, output a list of potential recipes that they may want to cook.
+This is a project to celebrate the diversity of Asian Food through data visualization of thousands of Asian recipes. The program will also include a recommender system in the future, where based on a user's available ingredients, will suggest a highly rated recipe. All data is scraped from thewoksoflife.com, and I greatly thank them for allowing me the opportunity to conduct this project.
 
+To scrape recipes, simply installing and running the Recipe_Scraper.py file will generate an uncleaned csv file (the terminal will ask you to name this csv file). If you would prefer to simply see the visualization, all relevant graphs will be available inside the repo; otherwise, you can view them in the .ipynb file.
+
+Credits:
+thewoksoflife.com

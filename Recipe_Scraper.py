@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import time
 from numpy import nan
+from os import path
 from bs4 import BeautifulSoup
 
 
@@ -75,6 +76,14 @@ def parse_recipe(link):
         return dictionary
 
 
+def export_csv(filename, df):
+    if not path.isfile(str(filename) + '.csv'):
+        df.to_csv(str(filename) + '.csv', index= False)
+    else:
+        new_filename = input("CSV file exists, please enter a new name: ")
+        export_csv(new_filename, df)
+
+
 def main():
     links = ['https://thewoksoflife.com/category/recipes/chicken/page/',
              'https://thewoksoflife.com/category/recipes/beef-recipes/page/',
@@ -96,7 +105,7 @@ def main():
     dict_list = [parse_recipe(recipe) for link in links for recipe in get_links(link) if parse_recipe(recipe)]
     recipe_df = pd.DataFrame(dict_list)
     csv_title = input("Please enter a title for the outputted CSV file: ")
-    recipe_df.to_csv(csv_title + ".csv")
+    export_csv(csv_title, recipe_df)
 
 
 if __name__ == "__main__":
