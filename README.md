@@ -1,4 +1,4 @@
-#Recipe Scraping Project w/ Data Analysis & Recommender System (in progress)
+# Recipe Scraping Project w/ Data Analysis & Recommender System (in progress)
 
 **About:**
 This is a project to celebrate the diversity of Asian Food through data visualization of thousands of Asian recipes. The program will also include a recommender system in the future, where based on a user's available ingredients, will suggest a highly rated recipe. All data is scraped from thewoksoflife.com, and I greatly thank them for allowing me the opportunity to conduct this project.
