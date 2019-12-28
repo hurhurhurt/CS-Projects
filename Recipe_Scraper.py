@@ -68,6 +68,7 @@ def parse_recipe(link):
             category = str(recipe['recipeCategory']).strip("['']")
         except KeyError:
             category = nan
+        url = link
         # creates a dictionary that will be converted into DataFrame for performance purposes
         dictionary = {'Name': name,
                       'Prep Time': prep_time,
@@ -77,7 +78,8 @@ def parse_recipe(link):
                       'Calories': calories,
                       'Review Count': review_count,
                       'Average Rating': average_rating,
-                      'Category': category}
+                      'Category': category,
+                      'URL': link}
 
         time.sleep(0.3) # As the website is not big, it's important to take server strain into consideration
         return dictionary
