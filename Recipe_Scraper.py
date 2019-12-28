@@ -9,11 +9,12 @@ from bs4 import BeautifulSoup
 
 def get_links(link):
     ''' iterates over link and returns a list of links to every recipe contained in each page '''
+    headers = {'user_agent': 'Thomas Hur, Student (thur1@binghamton.edu)'}
     recipes = []
     page_number = 1
     while True:
         page = link + str(page_number) + "/"
-        newPage = requests.get(page)
+        newPage = requests.get(page, headers=headers)
         if newPage.status_code == 404:
             break
         soup = BeautifulSoup(newPage.content, 'html.parser')
@@ -28,6 +29,7 @@ def parse_recipe(link):
     soup = BeautifulSoup(requests.get(link).text, 'html.parser')
     data = json.loads(soup.select_one('script.yoast-schema-graph.yoast-schema-graph--main').text)
     recipe = next((g for g in data['@graph'] if g.get('@type', '') == 'Recipe'), None)
+
     if recipe:
         # we use try/except catch blocks because some recipes are missing several parameters
         try:
@@ -47,7 +49,7 @@ def parse_recipe(link):
         except KeyError:
             total_time = nan
         try:
-            ingredients = recipe['recipeIngredient']
+            ingredients = str(recipe['recipeIngredient']).strip("['']")
         except KeyError:
             ingredients = nan
         try:
@@ -62,6 +64,10 @@ def parse_recipe(link):
             average_rating = recipe['aggregateRating']['ratingValue']
         except KeyError:
             average_rating = nan
+        try:
+            category = str(recipe['recipeCategory']).strip("['']")
+        except KeyError:
+            category = nan
         # creates a dictionary that will be converted into DataFrame for performance purposes
         dictionary = {'Name': name,
                       'Prep Time': prep_time,
@@ -70,13 +76,15 @@ def parse_recipe(link):
                       'Ingredients': ingredients,
                       'Calories': calories,
                       'Review Count': review_count,
-                      'Average Rating': average_rating}
+                      'Average Rating': average_rating,
+                      'Category': category}
 
         time.sleep(0.3) # As the website is not big, it's important to take server strain into consideration
         return dictionary
 
 
 def export_csv(filename, df):
+    ''' Requests user to input a file name for output to csv, and if no conflicting filename, creates csv file '''
     if not path.isfile(str(filename) + '.csv'):
         df.to_csv(str(filename) + '.csv', index= False)
     else:
