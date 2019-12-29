@@ -9,12 +9,11 @@ from bs4 import BeautifulSoup
 
 def get_links(link):
     ''' iterates over link and returns a list of links to every recipe contained in each page '''
-    headers = {'user_agent': 'Thomas Hur, Student (thur1@binghamton.edu)'}
     recipes = []
     page_number = 1
     while True:
         page = link + str(page_number) + "/"
-        newPage = requests.get(page, headers=headers)
+        newPage = requests.get(page)
         if newPage.status_code == 404:
             break
         soup = BeautifulSoup(newPage.content, 'html.parser')
@@ -81,7 +80,7 @@ def parse_recipe(link):
                       'Category': category,
                       'URL': link}
 
-        time.sleep(0.3) # As the website is not big, it's important to take server strain into consideration
+        time.sleep(2) # As the website is not big, it's important to take server strain into consideration
         return dictionary
 
 
