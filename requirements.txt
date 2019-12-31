@@ -1,4 +1,4 @@
-BeautifulSoup==4.8.2
-Requests==2.20
-Pandas==0.25.3
-Numpy==1.16.6
+bs4
+requests
+pandas
+numpy

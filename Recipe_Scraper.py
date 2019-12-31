@@ -94,7 +94,7 @@ def export_csv(filename, df):
 
 
 def main():
-    links = ['https://thewoksoflife.com/category/recipes/chicken/page/',
+    links = ('https://thewoksoflife.com/category/recipes/chicken/page/',
              'https://thewoksoflife.com/category/recipes/beef-recipes/page/',
              'https://thewoksoflife.com/category/recipes/fish-and-seafood/page/',
              'https://thewoksoflife.com/category/recipes/pork/page/',
@@ -108,7 +108,7 @@ def main():
              'https://thewoksoflife.com/category/recipes/soups-and-stocks/page/',
              'https://thewoksoflife.com/category/recipes/vegetarian/page/',
              'https://thewoksoflife.com/category/recipes/quick-and-easy/page/',
-             'https://thewoksoflife.com/category/recipes/rice-and-noodles-recipes/page/']
+             'https://thewoksoflife.com/category/recipes/rice-and-noodles-recipes/page/')
 
     # Creates a dictionary of parsed recipes
     dict_list = [parse_recipe(recipe) for link in links for recipe in get_links(link) if parse_recipe(recipe)]
