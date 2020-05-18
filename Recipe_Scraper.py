@@ -6,9 +6,13 @@ from numpy import nan
 from os import path
 from bs4 import BeautifulSoup
 
-
 def get_links(link):
-    ''' iterates over link and returns a list of links to every recipe contained in each page '''
+    """
+    Iterates over link and returns a list of links to every recipe contained in each page
+
+    :param link: this is a link to a directory page containing a list of recipes
+    :returns: this returns an array containing every link to each recipe in the page
+    """
     recipes = []
     page_number = 1
     while True:
@@ -24,7 +28,14 @@ def get_links(link):
 
 
 def parse_recipe(link):
-    ''' Parses through a webpage and extracts relevant info, returns a dictionary. '''
+    """
+    Gathers relevant information from given recipe and stores in a dictionary
+
+    :param link: a link to a recipe
+    :returns: a dictionary containing recipe name, prep time, cook time, total time, ingredients, calories,
+              review count, ratings, and category.
+    """
+
     soup = BeautifulSoup(requests.get(link).text, 'html.parser')
     data = json.loads(soup.select_one('script.yoast-schema-graph.yoast-schema-graph--main').text)
     recipe = next((g for g in data['@graph'] if g.get('@type', '') == 'Recipe'), None)
@@ -80,12 +91,18 @@ def parse_recipe(link):
                       'Category': category,
                       'URL': link}
 
-        time.sleep(2) # As the website is not big, it's important to take server strain into consideration
+        time.sleep(1) # As the website is not big, it's important to take server strain into consideration
         return dictionary
 
 
 def export_csv(filename, df):
-    ''' Requests user to input a file name for output to csv, and if no conflicting filename, creates csv file '''
+    """
+    Generates a csv file from given dataframe.
+
+    :param filename: the name of the file to be created
+    :param df: dataframe containing information to be exported
+    """
+
     if not path.isfile(str(filename) + '.csv'):
         df.to_csv(str(filename) + '.csv', index= False)
     else:
