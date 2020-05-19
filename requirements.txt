@@ -4,3 +4,5 @@ pandas
 numpy
 matplotlib
 wordcloud
+gensim
+nltk
