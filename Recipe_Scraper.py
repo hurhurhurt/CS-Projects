@@ -1,10 +1,10 @@
 import requests
 import json
 import pandas as pd
-import time
 from numpy import nan
 from os import path
 from bs4 import BeautifulSoup
+import time
 
 def get_links(link):
     """
@@ -35,9 +35,11 @@ def parse_recipe(link):
     :returns: a dictionary containing recipe name, prep time, cook time, total time, ingredients, calories,
               review count, ratings, and category.
     """
-
+    print(link) # should print twice
+    if requests.get(link).status_code == 404:
+        return
     soup = BeautifulSoup(requests.get(link).text, 'html.parser')
-    data = json.loads(soup.select_one('script.yoast-schema-graph.yoast-schema-graph--main').text)
+    data = json.loads(soup.find('script', type='application/ld+json').string)
     recipe = next((g for g in data['@graph'] if g.get('@type', '') == 'Recipe'), None)
 
     if recipe:
@@ -78,7 +80,6 @@ def parse_recipe(link):
             category = str(recipe['recipeCategory']).strip("['']")
         except KeyError:
             category = nan
-        url = link
         # creates a dictionary that will be converted into DataFrame for performance purposes
         dictionary = {'Name': name,
                       'Prep Time': prep_time,
@@ -91,7 +92,7 @@ def parse_recipe(link):
                       'Category': category,
                       'URL': link}
 
-        time.sleep(1) # As the website is not big, it's important to take server strain into consideration
+        time.sleep(0.25) # As the website is not big, it's important to take server strain into consideration
         return dictionary
 
 
@@ -111,7 +112,9 @@ def export_csv(filename, df):
 
 
 def main():
-    links = ('https://thewoksoflife.com/category/recipes/chicken/page/',
+    links = ('https://thewoksoflife.com/category/recipes/noodles-pasta-recipes/page/',
+             'https://thewoksoflife.com/category/recipes/rice-recipes/page/',
+             'https://thewoksoflife.com/category/recipes/chicken/page/',
              'https://thewoksoflife.com/category/recipes/beef-recipes/page/',
              'https://thewoksoflife.com/category/recipes/fish-and-seafood/page/',
              'https://thewoksoflife.com/category/recipes/pork/page/',
@@ -124,11 +127,15 @@ def main():
              'https://thewoksoflife.com/category/recipes/tofu/page/',
              'https://thewoksoflife.com/category/recipes/soups-and-stocks/page/',
              'https://thewoksoflife.com/category/recipes/vegetarian/page/',
-             'https://thewoksoflife.com/category/recipes/quick-and-easy/page/',
-             'https://thewoksoflife.com/category/recipes/rice-and-noodles-recipes/page/')
+             'https://thewoksoflife.com/category/recipes/quick-and-easy/page/',)
 
-    # Creates a dictionary of parsed recipes
-    dict_list = [parse_recipe(recipe) for link in links for recipe in get_links(link) if parse_recipe(recipe)]
+    dict_list = []
+    for link in links:
+        print("ENTERING NEW CATEGORY: ", link)
+        for recipe in get_links(link):
+            temp = parse_recipe(recipe)
+            if temp:
+                dict_list.append(temp)
     recipe_df = pd.DataFrame(dict_list)
     csv_title = input("Please enter a title for the outputted CSV file: ")
     export_csv(csv_title, recipe_df)
