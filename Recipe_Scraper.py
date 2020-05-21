@@ -92,7 +92,7 @@ def parse_recipe(link):
                       'Category': category,
                       'URL': link}
 
-        time.sleep(0.25) # As the website is not big, it's important to take server strain into consideration
+        time.sleep(0.25)  # As the website is not big, it's important to take server strain into consideration
         return dictionary
 
 
@@ -131,7 +131,6 @@ def main():
 
     dict_list = []
     for link in links:
-        print("ENTERING NEW CATEGORY: ", link)
         for recipe in get_links(link):
             temp = parse_recipe(recipe)
             if temp:
